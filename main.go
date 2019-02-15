@@ -9,7 +9,11 @@ var data = `
 PICKLES:
   en.US: Pickles
   de.DE: Gurken
-  es.MX: Pepinillos
+  es.ES: Pepinillos
+TOMATO:
+  en.US: Tomato
+  de.DE: Tomate
+  es.ES: Tomate
 `
 
 func tryit(g *globe.GlobeDB, str, lang string) {
@@ -34,9 +38,15 @@ func main() {
 
 	tryit(globeDB, "PICKLES", "en.US")
 	tryit(globeDB, "PICKLES", "de.DE")
-	tryit(globeDB, "PICKLES", "es.MX")
+	tryit(globeDB, "PICKLES", "es.ES")
 
+	tryit(globeDB, "TOMATO", "en.US")
+	tryit(globeDB, "TOMATO", "de.DE")
+	tryit(globeDB, "TOMATO", "es.ES")
+	
 	tryit(globeDB, "PICKLES", "fr.FR")
 	tryit(globeDB, "HOT_POCKETS", "en.US")
+
+
 	
 }

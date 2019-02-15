@@ -12,6 +12,7 @@ type GlobeDB struct {
 	translations map[string]map[string]string
 }
 
+
 func LoadDBFromFile(filename string) (*GlobeDB, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -55,3 +56,5 @@ func (g *GlobeDB) Lookup(strname, lang string) (string, error) {
 
 	return translation, nil
 }
+
+
