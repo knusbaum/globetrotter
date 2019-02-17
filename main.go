@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/knusbaum/globetrotter/globe"
+	"net/http"
 )
 
 var data = `
@@ -14,6 +16,10 @@ TOMATO:
   en.US: Tomato
   de.DE: Tomate
   es.ES: Tomate
+FRUIT:
+  en.US: Fruit
+  de.DE: Frucht
+  es.ES: Fruta
 `
 
 func tryit(g *globe.GlobeDB, str, lang string) {
@@ -36,17 +42,9 @@ func main() {
 		return
 	}
 
-	tryit(globeDB, "PICKLES", "en.US")
-	tryit(globeDB, "PICKLES", "de.DE")
-	tryit(globeDB, "PICKLES", "es.ES")
+	r := mux.NewRouter()
+	r.HandleFunc("/", globe.RequestHandler(globeDB)).Methods("POST")
 
-	tryit(globeDB, "TOMATO", "en.US")
-	tryit(globeDB, "TOMATO", "de.DE")
-	tryit(globeDB, "TOMATO", "es.ES")
-	
-	tryit(globeDB, "PICKLES", "fr.FR")
-	tryit(globeDB, "HOT_POCKETS", "en.US")
+	http.ListenAndServe("0.0.0.0:8080", r)
 
-
-	
 }
