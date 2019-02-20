@@ -11,17 +11,17 @@ var data = `
 version: 1234
 translations:
   PICKLES:
-	en.US: Pickles
-	de.DE: Gurken
-	es.ES: Pepinillos
+    en.US: Pickles
+    de.DE: Gurken
+    es.ES: Pepinillos
   TOMATO:
-	en.US: Tomato
-	de.DE: Tomate
-	es.ES: Tomate
+    en.US: Tomato
+    de.DE: Tomate
+    es.ES: Tomate
   FRUIT:
-	en.US: Fruit
-	de.DE: Frucht
-	es.ES: Fruta
+    en.US: Fruit
+    de.DE: Frucht
+    es.ES: Fruta
 `
 
 func tryit(g *globe.GlobeDB, str, lang string) {

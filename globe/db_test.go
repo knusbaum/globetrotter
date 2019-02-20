@@ -12,29 +12,29 @@ var data = []byte(`
 version: 1234
 translations:
   PICKLES:
-	en.US: Pickles
-	de.DE: Gurken
-	es.ES: Pepinillos
+    en.US: Pickles
+    de.DE: Gurken
+    es.ES: Pepinillos
   TOMATO:
-	en.US: Tomato
-	de.DE: Tomate
-	es.ES: Tomate
+    en.US: Tomato
+    de.DE: Tomate
+    es.ES: Tomate
 `)
 
 var badData = []byte(`
 PICKLES:
   en.US:
-	- Pickles
-	- Guac
+    - Pickles
+    - Guac
   - de.DE: Gurken
   - es.MX: Pepinillos
 TOMATO:
   - en.US
-	- Tomato
+    - Tomato
   - de.DE
-	- Tomate
+    - Tomate
   - es.ES
-	- Tomate
+    - Tomate
 `)
 
 func TestLoadDB(t *testing.T) {
@@ -148,7 +148,6 @@ func TestLookupAll(t *testing.T) {
 				k, v, k, actual[k])
 		}
 	}
-
 }
 
 func tryLookup(g *GlobeDB, str, lang string) {
