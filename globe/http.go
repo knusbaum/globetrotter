@@ -28,40 +28,40 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
+type VersionResponse struct {
+	Version int `json:"version"`
+}
+
+func writeErr(err error, w http.ResponseWriter) {
+	fmt.Printf("Error: %s\n", err)
+	reply, err := json.Marshal(&ErrorResponse{err.Error()})
+	if err != nil {
+		fmt.Printf("Failed to marshal error: %s\n", err)
+		http.Error(w, `{"Error": "Unknown"}`, 500)
+		return
+	}
+	fmt.Fprintf(w, "%s", reply)
+}
+
 func StringRequestHandler(g *GlobeDB) func (w http.ResponseWriter, r *http.Request) {
 	return func (w http.ResponseWriter, r *http.Request) {
 		req := &StringRequest{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(req)
-		var resp []byte
-		var respStr string
-		
-		fmt.Printf("Got request: %#v\n", req)
 
 		if err != nil {
-			goto error
-		}
-
-		respStr, err = g.Lookup(req.Key, req.Translation)
-		if err != nil {
-			goto error
-		}
-
-		resp, err = json.Marshal(&StringResponse{respStr})
-		fmt.Fprintf(w, "%s", resp)
-		return
-
-	error:
-		fmt.Printf("Error: %s\n", err)
-		reply, err := json.Marshal(&ErrorResponse{err.Error()})
-		if err != nil {
-			fmt.Printf("Failed to marshal error: %s\n", err)
-			http.Error(w, `{"Error": "Unknown"}`, 500)
+			writeErr(err, w)
 			return
 		}
-		fmt.Fprintf(w, "%s", reply)
-		return
-		
+
+		respStr, err := g.Lookup(req.Key, req.Translation)
+		if err != nil {
+			writeErr(err, w)
+			return
+		}
+
+		resp, err := json.Marshal(&StringResponse{respStr})
+		fmt.Fprintf(w, "%s", resp)
 	}
 }
 
@@ -70,36 +70,33 @@ func FullTranslationRequestHandler(g *GlobeDB) func (w http.ResponseWriter, r *h
 		req := &FullRequest{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(req)
-		var resp []byte
-		var all map[string]string
-		var respObjects []FullResponse
-		
+
 		if err != nil {
-			goto error
+			writeErr(err, w)
+			return
 		}
 
-		all = g.LookupAll(req.Translation)
-		respObjects = make([]FullResponse, 0)
+		all := g.LookupAll(req.Translation)
+		respObjects := make([]FullResponse, 0)
 		for k, v := range all {
 			respObjects = append(respObjects, FullResponse{k, v})
 		}
 
-		resp, err = json.Marshal(respObjects)
+		resp, err := json.Marshal(respObjects)
 		if err != nil {
-			goto error
+			writeErr(err, w)
 		}
 		fmt.Fprintf(w, "%s", resp)
-		return
+	}
+}
 
-	error:
-		fmt.Printf("Error: %s\n", err)
-		reply, err := json.Marshal(&ErrorResponse{err.Error()})
+func VersionRequestHandler(g *GlobeDB) func (w http.ResponseWriter, r *http.Request) {
+	return func (w http.ResponseWriter, r *http.Request) {
+		resp, err := json.Marshal(VersionResponse{g.Version})
 		if err != nil {
-			fmt.Printf("Failed to marshal error: %s\n", err)
-			http.Error(w, `{"Error": "Unknown"}`, 500)
-			return
+			writeErr(err, w)
 		}
-		fmt.Fprintf(w, "%s", reply)
+		fmt.Fprintf(w, "%s", resp)
 		return
 	}
 }

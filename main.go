@@ -47,8 +47,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/translate", globe.StringRequestHandler(globeDB)).Methods("POST")
 	r.HandleFunc("/full", globe.FullTranslationRequestHandler(globeDB)).Methods("POST")
+	r.HandleFunc("/version", globe.VersionRequestHandler(globeDB)).Methods("GET")
 
 	http.ListenAndServe("0.0.0.0:8080", r)
-
-
 }

@@ -19,6 +19,10 @@ translations:
     en.US: Tomato
     de.DE: Tomate
     es.ES: Tomate
+  FRUIT:
+    en.US: Fruit
+    de.DE: Frucht
+    es.ES: Fruta
 `)
 
 var badData = []byte(`
@@ -176,6 +180,10 @@ func ExampleLookups() {
 	tryLookup(globeDB, "TOMATO", "de.DE")
 	tryLookup(globeDB, "TOMATO", "es.ES")
 
+	tryLookup(globeDB, "FRUIT", "en.US")
+	tryLookup(globeDB, "FRUIT", "de.DE")
+	tryLookup(globeDB, "FRUIT", "es.ES")
+
 	tryLookup(globeDB, "PICKLES", "fr.FR")
 	tryLookup(globeDB, "HOT_POCKETS", "en.US")
 	// Output:
@@ -185,6 +193,9 @@ func ExampleLookups() {
 	// Looking up TOMATO, en.US ... Found: Tomato
 	// Looking up TOMATO, de.DE ... Found: Tomate
 	// Looking up TOMATO, es.ES ... Found: Tomate
+	// Looking up FRUIT, en.US ... Found: Fruit
+	// Looking up FRUIT, de.DE ... Found: Frucht
+	// Looking up FRUIT, es.ES ... Found: Fruta
 	// Looking up PICKLES, fr.FR ... Error: Translation fr.FR not found for string PICKLES
 	// Looking up HOT_POCKETS, en.US ... Error: No such string HOT_POCKETS
 }
