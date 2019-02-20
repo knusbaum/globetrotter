@@ -8,18 +8,20 @@ import (
 )
 
 var data = `
-PICKLES:
-  en.US: Pickles
-  de.DE: Gurken
-  es.ES: Pepinillos
-TOMATO:
-  en.US: Tomato
-  de.DE: Tomate
-  es.ES: Tomate
-FRUIT:
-  en.US: Fruit
-  de.DE: Frucht
-  es.ES: Fruta
+version: 1234
+translations:
+  PICKLES:
+	en.US: Pickles
+	de.DE: Gurken
+	es.ES: Pepinillos
+  TOMATO:
+	en.US: Tomato
+	de.DE: Tomate
+	es.ES: Tomate
+  FRUIT:
+	en.US: Fruit
+	de.DE: Frucht
+	es.ES: Fruta
 `
 
 func tryit(g *globe.GlobeDB, str, lang string) {
@@ -43,8 +45,10 @@ func main() {
 	}
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", globe.RequestHandler(globeDB)).Methods("POST")
+	r.HandleFunc("/translate", globe.StringRequestHandler(globeDB)).Methods("POST")
+	r.HandleFunc("/full", globe.FullTranslationRequestHandler(globeDB)).Methods("POST")
 
 	http.ListenAndServe("0.0.0.0:8080", r)
+
 
 }

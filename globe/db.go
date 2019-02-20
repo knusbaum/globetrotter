@@ -9,9 +9,14 @@ import (
 )
 
 type GlobeDB struct {
-	translations map[string]map[string]string
+	Version int
+	Translations map[string]map[string]string
 }
 
+type TranslationPair struct {
+	Key string
+	String string
+}
 
 func LoadDBFromFile(filename string) (*GlobeDB, error) {
 	file, err := os.Open(filename)
@@ -24,8 +29,8 @@ func LoadDBFromFile(filename string) (*GlobeDB, error) {
 func LoadDBFromReader(r io.Reader) (*GlobeDB, error) {
 	decoder := yaml.NewDecoder(r)
 	g := &GlobeDB{}
-	
-	err := decoder.Decode(&g.translations)
+
+	err := decoder.Decode(&g)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +40,7 @@ func LoadDBFromReader(r io.Reader) (*GlobeDB, error) {
 
 func LoadDB(in []byte) (*GlobeDB, error) {
 	g := &GlobeDB{}
-	err := yaml.Unmarshal(in, &g.translations)
+	err := yaml.Unmarshal(in, &g)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +49,7 @@ func LoadDB(in []byte) (*GlobeDB, error) {
 }
 
 func (g *GlobeDB) Lookup(strname, lang string) (string, error) {
-	languages, ok := g.translations[strname]
+	languages, ok := g.Translations[strname]
 	if !ok {
 		return "", errors.New(fmt.Sprintf("No such string %s", strname))
 	}
@@ -58,3 +63,17 @@ func (g *GlobeDB) Lookup(strname, lang string) (string, error) {
 }
 
 
+// Should optimize this. Right now it's O(Num_langs + Num_Keys)
+// Basically a full scan is necessary to assemble the dictionary.
+func (g *GlobeDB) LookupAll(lang string) map[string]string {
+	dictionary := make(map[string]string)
+
+	for key, strMap := range g.Translations {
+		translation, ok := strMap[lang]
+		if ok {
+			//pairs = append(pairs, TranslationPair{key, translation})
+			dictionary[key] = translation
+		}
+	}
+	return dictionary
+}

@@ -9,30 +9,32 @@ import (
 )
 
 var data = []byte(`
-PICKLES:
-  en.US: Pickles
-  de.DE: Gurken
-  es.ES: Pepinillos
-TOMATO:
-  en.US: Tomato
-  de.DE: Tomate
-  es.ES: Tomate
+version: 1234
+translations:
+  PICKLES:
+	en.US: Pickles
+	de.DE: Gurken
+	es.ES: Pepinillos
+  TOMATO:
+	en.US: Tomato
+	de.DE: Tomate
+	es.ES: Tomate
 `)
 
 var badData = []byte(`
 PICKLES:
-  en.US: 
-    - Pickles
-    - Guac
+  en.US:
+	- Pickles
+	- Guac
   - de.DE: Gurken
   - es.MX: Pepinillos
 TOMATO:
   - en.US
-    - Tomato
+	- Tomato
   - de.DE
-    - Tomate
+	- Tomate
   - es.ES
-    - Tomate
+	- Tomate
 `)
 
 func TestLoadDB(t *testing.T) {
@@ -53,14 +55,14 @@ func TestLoadDBFromReader(t *testing.T) {
 }
 
 func TestLoadDBFromFile(t *testing.T) {
-    tmpFile, err := ioutil.TempFile("/tmp", "test.*.yml")
+	tmpFile, err := ioutil.TempFile("/tmp", "test.*.yml")
 	name := tmpFile.Name()
-	
+
 	if err != nil {
 		t.Errorf("Failed to open temporary file: %s", err)
 	}
 	defer os.Remove(name)
-	
+
 	_, err = tmpFile.Write(data)
 	tmpFile.Close() // Close regardless
 	if err != nil {
@@ -73,7 +75,6 @@ func TestLoadDBFromFile(t *testing.T) {
 		t.Errorf("Failed to load globe DB with LoadDBFromReader(%s): %s", name, err)
 	}
 }
-
 
 func TestLoadDBFail(t *testing.T) {
 	_, err := LoadDB(badData)
@@ -93,14 +94,14 @@ func TestLoadDBFromReaderFail(t *testing.T) {
 }
 
 func TestLoadDBFromFileFail(t *testing.T) {
-    tmpFile, err := ioutil.TempFile("/tmp", "test.*.yml")
+	tmpFile, err := ioutil.TempFile("/tmp", "test.*.yml")
 	name := tmpFile.Name()
-	
+
 	if err != nil {
 		t.Errorf("Failed to open temporary file: %s", err)
 	}
 	defer os.Remove(name)
-	
+
 	_, err = tmpFile.Write(badData)
 	tmpFile.Close() // Close regardless
 	if err != nil {
@@ -114,7 +115,41 @@ func TestLoadDBFromFileFail(t *testing.T) {
 	}
 }
 
+func TestLookupAll(t *testing.T) {
+	g, err := LoadDB(data)
 
+	if err != nil {
+		t.Errorf("Failed to load globe DB with LoadDB: %s", err)
+	}
+
+	//fmt.Printf("Got: %#v\n", g.LookupAll("en.US"))
+	expected := map[string]string {
+		"PICKLES": "Pickles",
+		"TOMATO": "Tomato",
+	}
+
+	actual := g.LookupAll("en.US")
+	for k, v := range expected {
+		if actual[k] != v {
+			t.Errorf("Expected actual[%s] == <%s>, but got actual[%s] == <%s>.\n",
+				k, v, k, actual[k])
+		}
+	}
+
+	expected = map[string]string {
+		"PICKLES": "Gurken",
+		"TOMATO": "Tomate",
+	}
+
+	actual = g.LookupAll("de.DE")
+	for k, v := range expected {
+		if actual[k] != v {
+			t.Errorf("Expected actual[%s] == <%s>, but got actual[%s] == <%s>.\n",
+				k, v, k, actual[k])
+		}
+	}
+
+}
 
 func tryLookup(g *GlobeDB, str, lang string) {
 	fmt.Printf("Looking up %s, %s ... ", str, lang)
@@ -125,7 +160,6 @@ func tryLookup(g *GlobeDB, str, lang string) {
 	}
 	fmt.Printf("Found: %s\n", str)
 }
-
 
 func ExampleLookups() {
 	globeDB, err := LoadDB(data)
